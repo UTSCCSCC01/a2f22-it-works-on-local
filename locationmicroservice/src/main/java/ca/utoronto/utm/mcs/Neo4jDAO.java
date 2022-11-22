@@ -86,4 +86,9 @@ public class Neo4jDAO {
         query = String.format(query, roadname1, roadname2);
         return this.session.run(query);
     }
+
+    public Result getAllDriverUid() {
+        String query = "MATCH (n :user) where n.is_driver='true' RETURN n.uid";
+        return this.session.run(query);
+    }
 } 
