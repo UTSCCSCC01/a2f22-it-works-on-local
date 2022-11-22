@@ -65,4 +65,15 @@ public class PostgresDAO {
             this.st.execute(query);
         }
     }
+
+    public void addUser(int uid, String email, String password, String prefer_name, Integer rides, Boolean isDriver) throws SQLException {
+
+        String query;
+        if (email != null && password != null && prefer_name != null) {
+            query = "INSERT INTO users (uid, email, password, name, rides, is_driver)\n" +
+                    "VALUES ('%d', '%s', '%s', '%s', '%d', '%d');";
+            query = String.format(query, uid, email, password, prefer_name, rides, isDriver);
+            this.st.execute(query);
+        }
+    }
 }
