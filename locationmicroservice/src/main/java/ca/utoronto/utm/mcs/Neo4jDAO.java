@@ -19,9 +19,8 @@ public class Neo4jDAO {
     private final String password = "123456";
 
     public Neo4jDAO() {
-//        Dotenv dotenv = Dotenv.load();
-//        String addr = dotenv.get("NEO4J_ADDR");
-        String addr = "localhost";
+        Dotenv dotenv = Dotenv.load();
+        String addr = dotenv.get("NEO4J_ADDR");
         String uriDb = "bolt://" + addr + ":7687";
 
         this.driver = GraphDatabase.driver(uriDb, AuthTokens.basic(this.username, this.password));
