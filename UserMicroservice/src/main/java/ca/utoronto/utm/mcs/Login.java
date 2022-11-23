@@ -52,9 +52,7 @@ public class Login extends Endpoint {
 
         // if all the variables are still null then there's no variables in request so retrun 400
         if (email == null || password == null) {
-            JSONObject res = new JSONObject();
-            res.put("status", "BAD REQUEST BODY");
-            this.sendResponse(r, res, 400);
+            this.sendStatus(r, 400);
             return;
         }
 
@@ -66,17 +64,13 @@ public class Login extends Endpoint {
             resultHasNext = rs.next();
         }
         catch (SQLException e) {
-            JSONObject res = new JSONObject();
-            res.put("status", e.getMessage());
-            this.sendResponse(r, res, 500);
+            this.sendStatus(r, 500);
             return;
         }
 
         // check if user was found, return 404 if not found
         if (!resultHasNext) {
-            JSONObject res = new JSONObject();
-            res.put("status", "USER NOT FOUND");
-            this.sendResponse(r, res, 404);
+            this.sendStatus(r, 404);
             return;
         }
 
@@ -86,23 +80,18 @@ public class Login extends Endpoint {
             pass = rs.getString("password");
         }
         catch (SQLException e) {
-            JSONObject res = new JSONObject();
-            res.put("status", e.getMessage());
-            this.sendResponse(r, res, 500);
+            this.sendStatus(r, 500);
             return;
         }
 
         // Check if passwords match
-        if(!password.equals(pass)) {
-            JSONObject res = new JSONObject();
-            res.put("status", "INCORRECT PASSWORD");
-            this.sendResponse(r, res, 401);
+        String generatedPassword = this.dao.hashingMD5(password);
+        if(!generatedPassword.equals(pass)) {
+            this.sendStatus(r, 401);
             return;
         }
 
         // return 200 if user is logged in with the given credentials
-        JSONObject res = new JSONObject();
-        res.put("status", "OK");
-        this.sendResponse(r, res, 200);
+        this.sendStatus(r, 200);
     }
 }
