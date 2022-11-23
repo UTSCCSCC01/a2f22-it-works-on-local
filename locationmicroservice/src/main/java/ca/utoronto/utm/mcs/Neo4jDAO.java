@@ -1,7 +1,15 @@
 package ca.utoronto.utm.mcs;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.neo4j.driver.*;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.neo4j.driver.Record;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Neo4jDAO {
 
@@ -85,5 +93,155 @@ public class Neo4jDAO {
         String query = "MATCH (r1:road {name: '%s'})-[r:ROUTE_TO]->(r2:road {name: '%s'}) DELETE r RETURN COUNT(r) AS numDeletedRoutes";
         query = String.format(query, roadname1, roadname2);
         return this.session.run(query);
+    }
+
+    public Result usersStreet(String driverUid, String passengerUid){
+        String query = "MATCH (driver: user {uid: '%s'}), (passenger: user {uid: '%s'}) " +
+                        "RETURN driver.street, passenger.street";
+        query = String.format(query, driverUid, passengerUid);
+        return this.session.run(query);
+    }
+
+    public int getTotalEdges(String driverStreet, String passengerStreet){
+        String query = "MATCH p = shortestPath((driverStreet: road {name: '%s'})-[*]-(passengerStreet: road {name: '%s'}))" +
+                "RETURN length(p)";
+        query = String.format(query, driverStreet, passengerStreet);
+        Result result = this.session.run(query);
+        if(result.hasNext()){
+            int value = Integer.parseInt(result.next().toString().replaceAll("[^0-9]", ""));
+            return value;
+        }
+        return 0;
+    }
+
+    public int  getTotalTime(String driverStreet, String passengerStreet){
+        if(driverStreet.equals(passengerStreet)){
+            return 0;
+        }
+        String query = "MATCH p = shortestPath((driverStreet: road {name: '%s'})-[*]-(passengerStreet: road {name: '%s'})) WITH " +
+                "[r in relationships(p) | r.travel_time] as totalTime " +
+                "RETURN reduce(t=0, r in totalTime | t+r ) as totalTime";
+        query = String.format(query, driverStreet, passengerStreet);
+        Result result = this.session.run(query);
+        if(result.hasNext()){
+            int value = Integer.parseInt(result.next().toString().replaceAll("[^0-9]", ""));
+            return value;
+        }
+        return 0;
+    }
+
+    public boolean validRoad(String street){
+        Result result = getRoad(street);
+        if(!result.hasNext()){
+            return false;
+        }
+        return true;
+    }
+
+    public boolean validUser(String uid){
+        Result result = getUserByUid(uid);
+        if(!result.hasNext()){
+            return false;
+        }
+        return true;
+    }
+
+    public ArrayList<JSONObject> getPath(String driverStreet, String passengerStreet) throws JSONException {
+        ArrayList<JSONObject> route = new ArrayList<JSONObject>();
+        if(!validRoad(driverStreet) || !validRoad(passengerStreet)){
+            return null;
+        }
+
+        if(driverStreet.equals(passengerStreet)){
+            JSONObject temp = new JSONObject();
+            temp.put("time", 0);
+            temp.put("street", driverStreet);
+
+            String query = "MATCH (street: road {name: '%s'}) " +
+                    "RETURN toLower(toString(street.has_traffic))";
+
+            query = String.format(query, driverStreet);
+            Result result = this.session.run(query);
+            boolean [] has_traffic = new boolean[1];
+            if (result.hasNext()) {
+                List<Record> record = result.list();
+                for (int i = 0; i < record.size(); i++) {
+                    String val = record.get(i).values().toString();
+                    String newVal = val.substring(2, val.length() - 2);
+                    System.out.println(newVal);
+                    has_traffic[0] = Boolean.parseBoolean(newVal);
+                }
+            }
+            temp.put("is_traffic", has_traffic[0]);
+            route.add(temp);
+            return route;
+        }
+
+        int value = getTotalEdges(driverStreet, passengerStreet);
+        int [] travelTimes = new int [value + 1];
+        boolean [] has_traffic = new boolean[value + 1];
+        String[] road_name = new String[value + 1];
+        JSONObject final_obj = new JSONObject();
+
+        String query1 = "MATCH p = shortestPath((driverStreet: road {name: '%s'})-[*]-(passengerStreet: road {name: '%s'})) " +
+                        "UNWIND relationships(p) as r " +
+                        "RETURN r.travel_time";
+
+        query1 = String.format(query1, driverStreet, passengerStreet);
+        Result result1 = this.session.run(query1);
+        if (result1.hasNext()) {
+            List<Record> record = result1.list();
+            for (int i = 0; i < record.size(); i++) {
+                String val = record.get(i).values().toString();
+                String newVal = val.substring(1, val.length() - 1);
+                travelTimes[i] = Integer.parseInt(newVal);
+            }
+        }
+
+        String query2 = "MATCH p = shortestPath((driverStreet: road {name: '%s'})-[*]-(passengerStreet: road {name: '%s'})) " +
+                "UNWIND nodes(p) as n " +
+                "RETURN toLower(toString(n.has_traffic))";
+
+        query2 = String.format(query2, driverStreet, passengerStreet);
+        Result result2 = this.session.run(query2);
+        if (result2.hasNext()) {
+            List<Record> record = result2.list();
+            for (int i = 0; i < record.size(); i++) {
+                String val = record.get(i).values().toString();
+                String newVal = val.substring(2, val.length() - 2);
+                has_traffic[i] = Boolean.parseBoolean(newVal);
+            }
+        }
+
+        String query3 = "MATCH p = shortestPath((driverStreet: road {name: '%s'})-[*]-(passengerStreet: road {name: '%s'})) " +
+                "UNWIND nodes(p) as n " +
+                "RETURN n.name";
+
+        query3 = String.format(query3, driverStreet, passengerStreet);
+        Result result3 = this.session.run(query3);
+        if (result3.hasNext()) {
+            List<Record> record = result3.list();
+            for (int i = 0; i < record.size(); i++) {
+                String val = record.get(i).values().toString();
+                String newVal = val.substring(1, val.length() - 1);
+                road_name[i] = newVal;
+            }
+        }
+
+        for(int i = 0; i < value + 1; i++){
+            JSONObject temp_obj = new JSONObject();
+            if(i == 0){
+                temp_obj.put("street", road_name[i]);
+                temp_obj.put("time", 0);
+                temp_obj.put("is_traffic", has_traffic[i]);
+            } else {
+                temp_obj.put("street", road_name[i]);
+                temp_obj.put("time", travelTimes[i-1]);
+                temp_obj.put("is_traffic", has_traffic[i]);
+            }
+            route.add(temp_obj);
+        }
+
+        return route;
     }
 } 
