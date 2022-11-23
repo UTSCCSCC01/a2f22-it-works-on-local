@@ -10,7 +10,7 @@ import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 
 public class Navigation extends Endpoint {
-    
+
     /**
      * GET /location/navigation/:driverUid?passengerUid=:passengerUid
      * @param driverUid, passengerUid

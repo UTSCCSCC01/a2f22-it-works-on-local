@@ -187,6 +187,7 @@ public class Neo4jDAO {
                         "UNWIND relationships(p) as r " +
                         "RETURN r.travel_time";
 
+
         query1 = String.format(query1, driverStreet, passengerStreet);
         Result result1 = this.session.run(query1);
         if (result1.hasNext()) {
@@ -244,4 +245,10 @@ public class Neo4jDAO {
 
         return route;
     }
-} 
+
+    public Result getAllDriverUid() {
+        String query = "MATCH (n :user) where n.is_driver=true RETURN n.uid";
+        return this.session.run(query);
+    }
+}
+
