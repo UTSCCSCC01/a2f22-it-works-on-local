@@ -36,7 +36,7 @@ public class Navigation extends Endpoint {
 
             if(!this.dao.validUser(driverUid) || !this.dao.validUser(passengerUid)){
                 this.sendStatus(r, 400);
-                response.put("status", "BAD REQUEST");
+                return;
             } else {
                 Result result = this.dao.usersStreet(driverUid, passengerUid);
                 if (result.hasNext()) {
@@ -45,9 +45,8 @@ public class Navigation extends Endpoint {
                         String d_street = user.get("driver.street").asString();
                         String p_street = user.get("passenger.street").asString();
                         if(!this.dao.validRoad(d_street) || !this.dao.validRoad(p_street)){
-                            response.put("status", "BAD REQUEST");
-                            System.out.println("HERE");
                             this.sendStatus(r, 400);
+                            return;
                         } else {
                             JSONObject navData = new JSONObject();
                             ArrayList<JSONObject> route = this.dao.getPath(d_street, p_street);
@@ -57,19 +56,19 @@ public class Navigation extends Endpoint {
                             response.put("status", "OK");
                         }
                     } catch (Exception e) {
-                        response.put("status", "INTERNAL SERVER ERROR");
-                        r.sendResponseHeaders(500, -1);
-                        e.printStackTrace();
+                        this.sendStatus(r, 500);
+                        return;
                     }
                 } else {
                     this.sendStatus(r, 404);
-                    response.put("status", "NOT FOUND");
+                    return;
                 }
             }
             byte[] val = response.toString().replace("\\\"", "").getBytes(); //Converts JSON Object to String
             if (val == null) {
-                response.put("status", "NOT FOUND");
                 r.sendResponseHeaders(404, -1);
+                this.sendStatus(r, 404);
+                return;
             } else {
                 r.sendResponseHeaders(200, val.length);
             }
@@ -77,7 +76,6 @@ public class Navigation extends Endpoint {
             os.write(val);
             os.close();
             return;
-
 
         } catch (Exception e) {
             e.printStackTrace();

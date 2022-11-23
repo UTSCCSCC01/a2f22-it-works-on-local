@@ -21,9 +21,8 @@ public class Neo4jDAO {
     public Neo4jDAO() {
 //        Dotenv dotenv = Dotenv.load();
 //        String addr = dotenv.get("NEO4J_ADDR");
-//        String uriDb = "bolt://" + addr + ":7687";
-
-        String uriDb = "bolt://localhost:7687";
+        String addr = "localhost";
+        String uriDb = "bolt://" + addr + ":7687";
 
         this.driver = GraphDatabase.driver(uriDb, AuthTokens.basic(this.username, this.password));
         this.session = this.driver.session();
