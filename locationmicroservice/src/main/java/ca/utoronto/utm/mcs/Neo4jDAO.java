@@ -131,8 +131,28 @@ public class Neo4jDAO {
         }
         return 0;
     }
+
+    public boolean validRoad(String street){
+        Result result = getRoad(street);
+        if(!result.hasNext()){
+            return false;
+        }
+        return true;
+    }
+
+    public boolean validUser(String uid){
+        Result result = getUserByUid(uid);
+        if(!result.hasNext()){
+            return false;
+        }
+        return true;
+    }
+
     public ArrayList<JSONObject> getPath(String driverStreet, String passengerStreet) throws JSONException {
         ArrayList<JSONObject> route = new ArrayList<JSONObject>();
+        if(!validRoad(driverStreet) || !validRoad(passengerStreet)){
+            return null;
+        }
 
         if(driverStreet.equals(passengerStreet)){
             JSONObject temp = new JSONObject();

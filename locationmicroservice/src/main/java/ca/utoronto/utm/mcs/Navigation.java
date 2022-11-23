@@ -28,62 +28,57 @@ public class Navigation extends Endpoint {
         }
 
         try {
+            JSONObject response = new JSONObject();
             String parameters = params[3];
             String[] inputs = parameters.split("\\?");
             String driverUid = inputs[0];
-            String passengerUid = inputs[1];
+            String passengerUid = inputs[1].split("=")[1];
 
-            Result result = this.dao.usersStreet(driverUid, passengerUid);
-            if (result.hasNext()) {
-                try {
-                    Record user = result.next();
-                    String d_street = user.get("driver.street").asString();
-                    String p_street = user.get("passenger.street").asString();
-                    JSONObject response = new JSONObject();
-                    response.put("status", "OK");
-                    JSONObject navData = new JSONObject();
-                    ArrayList<JSONObject> route = this.dao.getPath(d_street, p_street);
-                    navData.put("total_time", this.dao.getTotalTime(d_street,p_street));
-                    navData.put("route", new JSONArray(route));
-                    response.put("data", navData);
-
-                    byte[] val = response.toString().replace("\\\"", "").getBytes(); //Converts JSON Object to String
-                    if (val == null) {
-                        r.sendResponseHeaders(404, -1);
-                        return;
+            if(!this.dao.validUser(driverUid) || !this.dao.validUser(passengerUid)){
+                this.sendStatus(r, 400);
+                response.put("status", "BAD REQUEST");
+            } else {
+                Result result = this.dao.usersStreet(driverUid, passengerUid);
+                if (result.hasNext()) {
+                    try {
+                        Record user = result.next();
+                        String d_street = user.get("driver.street").asString();
+                        String p_street = user.get("passenger.street").asString();
+                        if(!this.dao.validRoad(d_street) || !this.dao.validRoad(p_street)){
+                            response.put("status", "BAD REQUEST");
+                            System.out.println("HERE");
+                            this.sendStatus(r, 400);
+                        } else {
+                            JSONObject navData = new JSONObject();
+                            ArrayList<JSONObject> route = this.dao.getPath(d_street, p_street);
+                            navData.put("total_time", this.dao.getTotalTime(d_street, p_street));
+                            navData.put("route", new JSONArray(route));
+                            response.put("data", navData);
+                            response.put("status", "OK");
+                        }
+                    } catch (Exception e) {
+                        response.put("status", "INTERNAL SERVER ERROR");
+                        r.sendResponseHeaders(500, -1);
+                        e.printStackTrace();
                     }
-                    r.sendResponseHeaders(200, val.length);
-                    OutputStream os = r.getResponseBody();
-                    os.write(val);
-                    os.close();
-                    return;
-
-                } catch (Exception e) {
-                    r.sendResponseHeaders(500, -1);
-                    e.printStackTrace();
-                    return;
+                } else {
+                    this.sendStatus(r, 404);
+                    response.put("status", "NOT FOUND");
                 }
             }
+            byte[] val = response.toString().replace("\\\"", "").getBytes(); //Converts JSON Object to String
+            if (val == null) {
+                response.put("status", "NOT FOUND");
+                r.sendResponseHeaders(404, -1);
+            } else {
+                r.sendResponseHeaders(200, val.length);
+            }
+            OutputStream os = r.getResponseBody();
+            os.write(val);
+            os.close();
+            return;
 
-//            if (result.hasNext()) {
-//                JSONObject res = new JSONObject();
-//
-//                Record user = result.next();
-//                Double longitude = user.get("n.longitude").asDouble();
-//                Double latitude = user.get("n.latitude").asDouble();
-//                String street = user.get("n.street").asString();
-//
-//                JSONObject data = new JSONObject();
-//                data.put("longitude", longitude);
-//                data.put("latitude", latitude);
-//                data.put("street", street);
-//                res.put("status", "OK");
-//                res.put("data", data);
-//
-//                this.sendResponse(r, res, 200);
-//            } else {
-//                this.sendStatus(r, 404);
-//            }
+
         } catch (Exception e) {
             e.printStackTrace();
             this.sendStatus(r, 500);
