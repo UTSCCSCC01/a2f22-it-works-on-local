@@ -97,7 +97,7 @@ public class Neo4jDAO {
 
     public Result usersStreet(String driverUid, String passengerUid){
         String query = "MATCH (driver: user {uid: '%s'}), (passenger: user {uid: '%s'}) " +
-                "RETURN driver.street, passenger.street";
+                        "RETURN driver.street, passenger.street";
         query = String.format(query, driverUid, passengerUid);
         return this.session.run(query);
     }
@@ -184,8 +184,9 @@ public class Neo4jDAO {
         JSONObject final_obj = new JSONObject();
 
         String query1 = "MATCH p = shortestPath((driverStreet: road {name: '%s'})-[*]-(passengerStreet: road {name: '%s'})) " +
-                "UNWIND relationships(p) as r " +
-                "RETURN r.travel_time";
+                        "UNWIND relationships(p) as r " +
+                        "RETURN r.travel_time";
+
 
         query1 = String.format(query1, driverStreet, passengerStreet);
         Result result1 = this.session.run(query1);
@@ -250,3 +251,4 @@ public class Neo4jDAO {
         return this.session.run(query);
     }
 }
+
