@@ -1,6 +1,8 @@
 package ca.utoronto.utm.mcs;
 
 import java.io.IOException;
+import java.util.List;
+
 import org.json.*;
 import com.sun.net.httpserver.HttpExchange;
 import org.neo4j.driver.Record;
@@ -19,7 +21,9 @@ public class Nearby extends Endpoint {
     public void handleGet(HttpExchange r) throws IOException, JSONException {
         // TODO
         String[] params = r.getRequestURI().toString().split("/");
-        if (params.length != 4 || params[2].isEmpty() || params[3].isEmpty())  {
+        String[] params2 = params[3].split("\\?");
+        String[] params3 = params2[1].split("=");
+        if (params.length != 4 || params[2].isEmpty() || params[3].isEmpty() || params2[0].isEmpty() || params3[1].isEmpty())  {
             this.sendStatus(r, 400);
             return;
         }
@@ -27,25 +31,30 @@ public class Nearby extends Endpoint {
         try {
             Double user_long = 0.0, user_lat = 0.0, longitude = 0.0, latitude = 0.0, driver_long = 0.0, driver_lat = 0.0, distance = 0.0;
             boolean flag = false;
-            String uid = params[2];
-            double radius  = Double.parseDouble(params[3]);
+            String uid = params2[0];
+            double radius  = Double.parseDouble(params3[1]);
             Result users = this.dao.getUserByUid(uid);
             if(users.hasNext()) {
-                Record user = users.next();
+                Result locations = this.dao.getUserLocationByUid(uid);
+                Record location = locations.next();
 
-                user_long = (user.get("n.longitude").asDouble()) / (180/Math.PI);
-                user_lat = (user.get("n.latitude").asDouble()) / (180/Math.PI);
+                user_long = (location.get("n.longitude").asDouble()) / (180/Math.PI);
+                user_lat = (location.get("n.latitude").asDouble()) / (180/Math.PI);
             } else {
                 this.sendStatus(r, 404);
             }
             Result result = this.dao.getAllDriverUid();
             JSONObject res = new JSONObject();
+            JSONObject driver = new JSONObject();
             while (result.hasNext()) {
-                Record driver = result.next();
+                Record curr_driver = result.next();
+                String driver_uid = curr_driver.get("n.uid").asString();
 
-                longitude = driver.get("n.longitude").asDouble();
-                latitude = driver.get("n.latitude").asDouble();
-                String street = driver.get("n.street").asString();
+                Record driver_info = this.dao.getUserLocationByUid(driver_uid).next();
+
+                longitude = driver_info.get("n.longitude").asDouble();
+                latitude = driver_info.get("n.latitude").asDouble();
+                String street = driver_info.get("n.street").asString();
 
                 driver_long = longitude / (180/Math.PI);
                 driver_lat = latitude / (180/Math.PI);
@@ -57,13 +66,14 @@ public class Nearby extends Endpoint {
                     data.put("longitude", longitude);
                     data.put("latitude", latitude);
                     data.put("street", street);
-                    res.put("data", "data");
+                    driver.put(driver_uid, data);
+                    res.put("data", driver);
                 }
             }
             if(flag) {
-                res.put("status", "OK");
+                this.sendResponse(r, res, 200);
             } else {
-                res.put("status", "No nearby drivers");
+                this.sendStatus(r, 404);
             }
         } catch (Exception e) {
             e.printStackTrace();

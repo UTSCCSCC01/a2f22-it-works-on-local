@@ -13,7 +13,7 @@ public class Neo4jDAO {
     public Neo4jDAO() {
         Dotenv dotenv = Dotenv.load();
         String addr = dotenv.get("NEO4J_ADDR");
-        String uriDb = "bolt://" + addr + ":7687";
+        String uriDb = "bolt://localhost:7687";
 
         this.driver = GraphDatabase.driver(uriDb, AuthTokens.basic(this.username, this.password));
         this.session = this.driver.session();
@@ -88,7 +88,7 @@ public class Neo4jDAO {
     }
 
     public Result getAllDriverUid() {
-        String query = "MATCH (n :user) where n.is_driver='true' RETURN n.uid";
+        String query = "MATCH (n :user) where n.is_driver=true RETURN n.uid";
         return this.session.run(query);
     }
 } 
