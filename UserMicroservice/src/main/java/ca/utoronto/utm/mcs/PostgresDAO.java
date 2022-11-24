@@ -14,6 +14,7 @@ public class PostgresDAO {
         Dotenv dotenv = Dotenv.load();
         String addr = dotenv.get("POSTGRES_ADDR");
         String url = "jdbc:postgresql://" + addr + ":5432/root";
+        //String url = "jdbc:postgresql://localhost:5432/root";
 		try {
             Class.forName("org.postgresql.Driver");
 			this.conn = DriverManager.getConnection(url, "root", "123456");
