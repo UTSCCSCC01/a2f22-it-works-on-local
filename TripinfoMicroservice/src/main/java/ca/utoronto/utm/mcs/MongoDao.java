@@ -31,9 +31,9 @@ public class MongoDao {
 		// Use Dotenv like in the DAOs of the other microservices.
 		Dotenv dotenv = Dotenv.load();
 		String addr = dotenv.get("MONGODB_ADDR");
-		//String uri = String.format("mongodb://%s:%s@", username, password) + addr + ":27017";
-		String uri = String.format("mongodb://%s:%s@", username, password) + "localhost"+ ":27017";
-		//this.mongoClient = new MongoClient("localhost", 27017);
+    
+		String uri = String.format("mongodb://%s:%s@", username, password) + addr + ":27017";
+		//String uri = String.format("mongodb://%s:%s@", username, password) + "localhost"+ ":27017";
 		MongoClient mongoClient = MongoClients.create(uri);
 		MongoDatabase mongoDatabase = mongoClient.getDatabase("trip");
 		this.collection = mongoDatabase.getCollection("trips");
@@ -118,4 +118,5 @@ public class MongoDao {
 		}
 		return null;
 	}
+}
 }

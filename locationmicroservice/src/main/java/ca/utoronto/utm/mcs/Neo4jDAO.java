@@ -224,7 +224,7 @@ public class Neo4jDAO {
             List<Record> record = result3.list();
             for (int i = 0; i < record.size(); i++) {
                 String val = record.get(i).values().toString();
-                String newVal = val.substring(1, val.length() - 1);
+                String newVal = val.substring(2, val.length() - 2);
                 road_name[i] = newVal;
             }
         }

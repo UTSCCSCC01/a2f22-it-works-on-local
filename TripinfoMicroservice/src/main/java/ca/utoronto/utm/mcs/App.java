@@ -14,6 +14,7 @@ public class App {
         server.createContext("/trip/", new Trip());
         server.createContext("/trip/passenger/", new Passenger());
         server.createContext("/trip/driver/", new Driver());
+        server.createContext("/trip/request", new Request());
 
         server.start();
         System.out.printf("Server started on port %d...\n", PORT);
