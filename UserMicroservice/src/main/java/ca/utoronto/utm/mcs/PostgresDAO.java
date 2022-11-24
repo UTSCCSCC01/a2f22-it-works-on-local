@@ -74,6 +74,24 @@ public class PostgresDAO {
         query = String.format(query, email);
         return this.st.executeQuery(query);
     }
+    
+    public void addUser(int uid, String email, String password, String prefer_name, int rides) throws SQLException {
+
+        String query;
+        if (email != null && password != null && prefer_name != null) {
+            query = "INSERT INTO users (uid, email, prefer_name, password, rides)\n" +
+                    "VALUES (%d, '%s', '%s', '%s', %d);";
+            query = String.format(query, uid, email, prefer_name, password, rides);
+            this.st.execute(query);
+        }
+    }
+
+    public boolean getUsersFromEmail(String email) throws SQLException {
+        String query = "SELECT uid FROM users WHERE email = '%s'";
+        query = String.format(query, email);
+        ResultSet res = this.st.executeQuery(query);
+        return res.next();
+    }
 
     public String hashingMD5(String password) {
         String generatedPassword = null;
