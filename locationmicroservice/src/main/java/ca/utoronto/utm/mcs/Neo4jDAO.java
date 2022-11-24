@@ -168,7 +168,6 @@ public class Neo4jDAO {
                 for (int i = 0; i < record.size(); i++) {
                     String val = record.get(i).values().toString();
                     String newVal = val.substring(2, val.length() - 2);
-                    System.out.println(newVal);
                     has_traffic[0] = Boolean.parseBoolean(newVal);
                 }
             }
