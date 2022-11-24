@@ -77,7 +77,7 @@ public class AppTest {
         body.put("password", "123");
         int val = post_request("http://localhost:8000/user/register", body);
 
-        assertEquals(401, val);
+        assertEquals(400, val);
     }
 
 }
