@@ -53,7 +53,7 @@ public class Navigation extends Endpoint {
                             navData.put("total_time", this.dao.getTotalTime(d_street, p_street));
                             navData.put("route", new JSONArray(route));
                             response.put("data", navData);
-                            response.put("status", "OK");
+                            this.sendResponse(r, response, 200);
                         }
                     } catch (Exception e) {
                         this.sendStatus(r, 500);
@@ -64,18 +64,6 @@ public class Navigation extends Endpoint {
                     return;
                 }
             }
-            byte[] val = response.toString().replace("\\\"", "").getBytes(); //Converts JSON Object to String
-            if (val == null) {
-                r.sendResponseHeaders(404, -1);
-                this.sendStatus(r, 404);
-                return;
-            } else {
-                r.sendResponseHeaders(200, val.length);
-            }
-            OutputStream os = r.getResponseBody();
-            os.write(val);
-            os.close();
-            return;
 
         } catch (Exception e) {
             e.printStackTrace();
