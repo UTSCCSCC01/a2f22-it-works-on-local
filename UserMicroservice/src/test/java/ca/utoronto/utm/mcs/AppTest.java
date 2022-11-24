@@ -39,8 +39,8 @@ public class AppTest {
     @Order(1)
     public void userRegisterPass() throws JSONException, IOException, InterruptedException {
         JSONObject body = new JSONObject();
-        body.put("name","Mojo2");
-        body.put("email","mojohossieni2@gmail.com");
+        body.put("name","Mojo");
+        body.put("email","mojoh@gmail.com");
         body.put("password", "123456");
         int val = post_request("http://localhost:8000/user/register", body);
 
@@ -51,11 +51,33 @@ public class AppTest {
     @Order(2)
     public void userRegisterFail() throws JSONException, IOException, InterruptedException {
         JSONObject body = new JSONObject();
-        body.put("name","Mojo2");
-        body.put("email","mojohossieni2@gmail.com");
+        body.put("name","Mojo");
+        body.put("email","mojoh@gmail.com");
         body.put("password", "123456");
         int val = post_request("http://localhost:8000/user/register", body);
 
         assertEquals(400, val);
     }
+    @Test
+    @Order(3)
+    public void userLoginPass() throws JSONException, IOException, InterruptedException {
+        JSONObject body = new JSONObject();
+        body.put("email","mojoh@gmail.com");
+        body.put("password", "123456");
+        int val = post_request("http://localhost:8000/user/login", body);
+
+        assertEquals(200, val);
+    }
+
+    @Test
+    @Order(4)
+    public void userLoginFail() throws JSONException, IOException, InterruptedException {
+        JSONObject body = new JSONObject();
+        body.put("email","mojoh2@gmail.com");
+        body.put("password", "123");
+        int val = post_request("http://localhost:8000/user/register", body);
+
+        assertEquals(401, val);
+    }
+
 }
