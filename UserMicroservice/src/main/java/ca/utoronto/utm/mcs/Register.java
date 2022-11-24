@@ -26,7 +26,6 @@ public class Register extends Endpoint {
             this.sendStatus(r, 400);
             return;
         }
-
         String body = Utils.convert(r.getRequestBody());
         JSONObject deserialized = new JSONObject(body);
 
@@ -59,24 +58,31 @@ public class Register extends Endpoint {
 
         // if all the variables are still null then there's no variables in request so retrun 400
         if (email == null || name == null || password == null) {
-            this.sendStatus(r, 200);
+            this.sendStatus(r, 400);
             return;
         }
 
         // update db, return 500 if error
         try {
+            boolean exists = this.dao.getUsersFromEmail(email);
+            if(exists) {
+                this.sendStatus(r, 400);
+                return;
+            }
             int uid;
             boolean resultHasNext;
             Random rand = new Random();
             uid = rand. nextInt(9000000) + 1000000;
             resultHasNext = this.dao.getUsersFromUid(uid).next();
-            while(!resultHasNext){
+            while(resultHasNext){
+                System.out.println("Entered while");
                 uid = rand. nextInt(9000000) + 1000000;
+                System.out.println(uid);
                 resultHasNext = this.dao.getUsersFromUid(uid).next();
             }
             String generatedPassword = this.dao.hashingMD5(password);
 
-            this.dao.addUser(uid, email, generatedPassword, name, 0, false);
+            this.dao.addUser(uid, email, generatedPassword, name, 0);
         }
         catch (SQLException e) {
             e.printStackTrace();

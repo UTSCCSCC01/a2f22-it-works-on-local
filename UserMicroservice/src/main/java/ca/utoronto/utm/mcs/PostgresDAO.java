@@ -14,6 +14,7 @@ public class PostgresDAO {
         Dotenv dotenv = Dotenv.load();
         String addr = dotenv.get("POSTGRES_ADDR");
         String url = "jdbc:postgresql://" + addr + ":5432/root";
+        //String url = "jdbc:postgresql://localhost:5432/root";
 		try {
             Class.forName("org.postgresql.Driver");
 			this.conn = DriverManager.getConnection(url, "root", "123456");
@@ -68,15 +69,22 @@ public class PostgresDAO {
         }
     }
 
-    public void addUser(int uid, String email, String password, String prefer_name, Integer rides, Boolean isDriver) throws SQLException {
+    public void addUser(int uid, String email, String password, String prefer_name, int rides) throws SQLException {
 
         String query;
         if (email != null && password != null && prefer_name != null) {
-            query = "INSERT INTO users (uid, email, password, name, rides, is_driver)\n" +
-                    "VALUES ('%d', '%s', '%s', '%s', '%d', '%d');";
-            query = String.format(query, uid, email, password, prefer_name, rides, isDriver);
+            query = "INSERT INTO users (uid, email, prefer_name, password, rides)\n" +
+                    "VALUES (%d, '%s', '%s', '%s', %d);";
+            query = String.format(query, uid, email, prefer_name, password, rides);
             this.st.execute(query);
         }
+    }
+
+    public boolean getUsersFromEmail(String email) throws SQLException {
+        String query = "SELECT uid FROM users WHERE email = '%s'";
+        query = String.format(query, email);
+        ResultSet res = this.st.executeQuery(query);
+        return res.next();
     }
 
     public String hashingMD5(String password) {
