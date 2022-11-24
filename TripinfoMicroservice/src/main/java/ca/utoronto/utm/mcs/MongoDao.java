@@ -13,8 +13,6 @@ public class MongoDao {
 	public MongoCollection<Document> collection;
 	private final String username = "root";
 	private final String password = "123456";
-	MongoDatabase mongoDatabase;
-
 
 	public MongoDao() {
 		// TODO:
