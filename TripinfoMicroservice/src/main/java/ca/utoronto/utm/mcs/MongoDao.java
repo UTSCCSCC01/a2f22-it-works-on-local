@@ -1,8 +1,8 @@
 package ca.utoronto.utm.mcs;
 
-import com.mongodb.MongoClient;
 import com.mongodb.client.*;
 import com.mongodb.*;
+import com.mongodb.client.MongoClient;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
@@ -14,7 +14,7 @@ public class MongoDao {
 	private final String username = "root";
 	private final String password = "123456";
 	MongoDatabase mongoDatabase;
-	MongoClient mongoClient;
+
 
 	public MongoDao() {
 		// TODO:
@@ -23,8 +23,8 @@ public class MongoDao {
 		Dotenv dotenv = Dotenv.load();
 		String addr = dotenv.get("MONGODB_ADDR");
 		String uri = String.format("mongodb://%s:%s@", username, password) +"localhost"+":27017";
-		this.mongoClient = new MongoClient("localhost", 27017);
-		this.mongoDatabase = mongoClient.getDatabase("trip");
+		MongoClient mongoClient = MongoClients.create(uri);
+		MongoDatabase mongoDatabase = mongoClient.getDatabase("trip");
 		this.collection =  mongoClient.getDatabase("trip").getCollection("trips");
 	}
 
