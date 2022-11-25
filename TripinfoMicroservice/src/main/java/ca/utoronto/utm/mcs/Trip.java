@@ -48,12 +48,12 @@ public class Trip extends Endpoint {
 
         try {
             FindIterable<Document> result = this.dao.getTripById(id);
-            if (result != null) {
+            if (result.cursor().hasNext()) {
                 boolean update = this.dao.updateTripInfo(id, distance, endTime, timeElapsed, discount, totalCost, driverPayout);
                 if (update) {
                     this.sendStatus(r, 200);
                 } else {
-                    this.sendStatus(r, 404);
+                    this.sendStatus(r, 500);
                 }
             } else {
                 this.sendStatus(r, 404);
