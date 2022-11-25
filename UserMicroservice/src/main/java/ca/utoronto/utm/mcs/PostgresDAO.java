@@ -1,5 +1,7 @@
 package ca.utoronto.utm.mcs;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -12,6 +14,7 @@ public class PostgresDAO {
         Dotenv dotenv = Dotenv.load();
         String addr = dotenv.get("POSTGRES_ADDR");
         String url = "jdbc:postgresql://" + addr + ":5432/root";
+        //String url = "jdbc:postgresql://localhost:5432/root";
 		try {
             Class.forName("org.postgresql.Driver");
 			this.conn = DriverManager.getConnection(url, "root", "123456");
@@ -64,5 +67,56 @@ public class PostgresDAO {
             query = String.format(query, isDriver.toString(), uid);
             this.st.execute(query);
         }
+    }
+
+    public ResultSet getUserDataFromCredentials(String email) throws SQLException {
+        String query = "SELECT password FROM users WHERE email = '%s'";
+        query = String.format(query, email);
+        return this.st.executeQuery(query);
+    }
+    
+    public void addUser(int uid, String email, String password, String prefer_name, int rides) throws SQLException {
+
+        String query;
+        if (email != null && password != null && prefer_name != null) {
+            query = "INSERT INTO users (uid, email, prefer_name, password, rides)\n" +
+                    "VALUES (%d, '%s', '%s', '%s', %d);";
+            query = String.format(query, uid, email, prefer_name, password, rides);
+            this.st.execute(query);
+        }
+    }
+
+    public boolean getUsersFromEmail(String email) throws SQLException {
+        String query = "SELECT uid FROM users WHERE email = '%s'";
+        query = String.format(query, email);
+        ResultSet res = this.st.executeQuery(query);
+        return res.next();
+    }
+
+    public String hashingMD5(String password) {
+        String generatedPassword = null;
+        try
+        {
+            // Create MessageDigest instance for MD5
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
+            // Add password bytes to digest
+            md.update(password.getBytes());
+
+            // Get the hash's bytes
+            byte[] bytes = md.digest();
+
+            // These bytes[] has bytes in decimal format. Convert it to hexadecimal format
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < bytes.length; i++) {
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+
+            // Get complete hashed password in hex format
+            generatedPassword = sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return generatedPassword;
     }
 }
