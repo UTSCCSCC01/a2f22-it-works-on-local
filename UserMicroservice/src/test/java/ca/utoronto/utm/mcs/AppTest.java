@@ -42,7 +42,7 @@ public class AppTest {
         body.put("name","Mojo");
         body.put("email","mojoh@gmail.com");
         body.put("password", "123456");
-        int val = post_request("http://localhost:8000/user/register", body);
+        int val = post_request("http://localhost:8004/user/register", body);
 
         assertEquals(200, val);
     }
@@ -54,7 +54,7 @@ public class AppTest {
         body.put("name","Mojo");
         body.put("email","mojoh@gmail.com");
         body.put("password", "123456");
-        int val = post_request("http://localhost:8000/user/register", body);
+        int val = post_request("http://localhost:8004/user/register", body);
 
         assertEquals(400, val);
     }
@@ -64,7 +64,7 @@ public class AppTest {
         JSONObject body = new JSONObject();
         body.put("email","mojoh@gmail.com");
         body.put("password", "123456");
-        int val = post_request("http://localhost:8000/user/login", body);
+        int val = post_request("http://localhost:8004/user/login", body);
 
         assertEquals(200, val);
     }
@@ -75,7 +75,7 @@ public class AppTest {
         JSONObject body = new JSONObject();
         body.put("email","mojoh2@gmail.com");
         body.put("password", "123");
-        int val = post_request("http://localhost:8000/user/register", body);
+        int val = post_request("http://localhost:8004/user/register", body);
 
         assertEquals(400, val);
     }
