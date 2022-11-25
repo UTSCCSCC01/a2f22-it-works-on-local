@@ -80,41 +80,41 @@ public class AppTest {
         JSONObject body1 = new JSONObject();
         body1.put("uid","john");
         body1.put("is_driver",true);
-        put_request("http://localhost:8000/location/user", body1);
+        put_request("http://localhost:8004/location/user", body1);
 
         JSONObject body2 = new JSONObject();
         body2.put("uid","ilir");
         body2.put("is_driver",false);
-        put_request("http://localhost:8000/location/user", body2);
+        put_request("http://localhost:8004/location/user", body2);
 
         JSONObject body3 = new JSONObject();
         body3.put("longitude",78.0732);
         body3.put("latitude",42.0543);
         body3.put("street","road1");
-        patch_request("http://localhost:8000/location/john", body3);
+        patch_request("http://localhost:8004/location/john", body3);
 
         JSONObject body4 = new JSONObject();
         body4.put("longitude",78.0753);
         body4.put("latitude",42.0532);
         body4.put("street","road2");
-        patch_request("http://localhost:8000/location/ilir", body4);
+        patch_request("http://localhost:8004/location/ilir", body4);
 
         JSONObject body5 = new JSONObject();
         body5.put("roadName","road1");
         body5.put("hasTraffic",true);
-        put_request("http://localhost:8000/location/road", body5);
+        put_request("http://localhost:8004/location/road", body5);
 
         JSONObject body6 = new JSONObject();
         body6.put("roadName","road2");
         body6.put("hasTraffic",true);
-        put_request("http://localhost:8000/location/road", body6);
+        put_request("http://localhost:8004/location/road", body6);
 
         JSONObject body7 = new JSONObject();
         body7.put("roadName1", "road1");
         body7.put("roadName2", "road2");
         body7.put("hasTraffic", true);
         body7.put("time", 7);
-        post_request("http://localhost:8000/location/hasRoute", body7);
+        post_request("http://localhost:8004/location/hasRoute", body7);
 
         JSONObject body8 = new JSONObject();
         body8.put("uid", "ilir");
@@ -123,7 +123,7 @@ public class AppTest {
         HttpClient c = HttpClient.newBuilder().build();
         HttpRequest r = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/request")).
+                uri(URI.create("http://localhost:8004/trip/request")).
                 method("POST", HttpRequest.BodyPublishers.ofString(body8.toString())).build();
         HttpResponse<String> res = c.send(r, HttpResponse.BodyHandlers.ofString());
 
@@ -140,7 +140,7 @@ public class AppTest {
         HttpClient c = HttpClient.newBuilder().build();
         HttpRequest r = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/request")).
+                uri(URI.create("http://localhost:8004/trip/request")).
                 method("POST", HttpRequest.BodyPublishers.ofString(body.toString())).build();
         HttpResponse<String> res = c.send(r, HttpResponse.BodyHandlers.ofString());
 
@@ -158,7 +158,7 @@ public class AppTest {
         HttpClient c = HttpClient.newBuilder().build();
         HttpRequest r = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/confirm")).
+                uri(URI.create("http://localhost:8004/trip/confirm")).
                 method("POST", HttpRequest.BodyPublishers.ofString(body.toString())).build();
         HttpResponse<String> res = c.send(r, HttpResponse.BodyHandlers.ofString());
 
@@ -176,7 +176,7 @@ public class AppTest {
         HttpClient c = HttpClient.newBuilder().build();
         HttpRequest r = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/confirm")).
+                uri(URI.create("http://localhost:8004/trip/confirm")).
                 method("POST", HttpRequest.BodyPublishers.ofString(body.toString())).build();
         HttpResponse<String> res = c.send(r, HttpResponse.BodyHandlers.ofString());
 
@@ -232,7 +232,7 @@ public class AppTest {
         HttpClient c = HttpClient.newBuilder().build();
         HttpRequest r = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/2")).
+                uri(URI.create("http://localhost:8004/trip/2")).
                 method("PATCH", HttpRequest.BodyPublishers.ofString(body.toString())).
                 header("Content-Type", "application/json").
                 build();
@@ -247,7 +247,7 @@ public class AppTest {
         HttpClient c = HttpClient.newBuilder().build();
         HttpRequest r = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/passenger/ilir")).
+                uri(URI.create("http://localhost:8004/trip/passenger/ilir")).
                 build();
         HttpResponse<String> res = c.send(r, HttpResponse.BodyHandlers.ofString());
 
@@ -261,7 +261,7 @@ public class AppTest {
         HttpClient c = HttpClient.newBuilder().build();
         HttpRequest r = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/passenger/il")).
+                uri(URI.create("http://localhost:8004/trip/passenger/il")).
                 build();
         HttpResponse<String> res = c.send(r, HttpResponse.BodyHandlers.ofString());
         assertEquals(404, res.statusCode());
@@ -274,7 +274,7 @@ public class AppTest {
         HttpClient c = HttpClient.newBuilder().build();
         HttpRequest r = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/driver/john")).
+                uri(URI.create("http://localhost:8004/trip/driver/john")).
                 build();
         HttpResponse<String> res = c.send(r, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, res.statusCode());
@@ -287,7 +287,7 @@ public class AppTest {
         HttpClient c = HttpClient.newBuilder().build();
         HttpRequest r = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/driver/jo")).
+                uri(URI.create("http://localhost:8004/trip/driver/jo")).
                 build();
         HttpResponse<String> res = c.send(r, HttpResponse.BodyHandlers.ofString());
         assertEquals(404, res.statusCode());
@@ -305,7 +305,7 @@ public class AppTest {
         HttpClient c1 = HttpClient.newBuilder().build();
         HttpRequest r1 = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/confirm")).
+                uri(URI.create("http://localhost:8004/trip/confirm")).
                 method("POST", HttpRequest.BodyPublishers.ofString(body1.toString())).build();
         HttpResponse<String> res1 = c1.send(r1, HttpResponse.BodyHandlers.ofString());
 
@@ -316,7 +316,7 @@ public class AppTest {
         HttpClient c2 = HttpClient.newBuilder().build();
         HttpRequest r2 = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/driverTime/"+id)).
+                uri(URI.create("http://localhost:8004/trip/driverTime/"+id)).
                 build();
         HttpResponse<String> res2 = c2.send(r2, HttpResponse.BodyHandlers.ofString());
 
@@ -330,7 +330,7 @@ public class AppTest {
         HttpClient c2 = HttpClient.newBuilder().build();
         HttpRequest r2 = HttpRequest.
                 newBuilder().
-                uri(URI.create("http://localhost:8000/trip/driverTime/63801c88ed65344043d62345")).
+                uri(URI.create("http://localhost:8004/trip/driverTime/63801c88ed65344043d62345")).
                 build();
         HttpResponse<String> res2 = c2.send(r2, HttpResponse.BodyHandlers.ofString());
 
