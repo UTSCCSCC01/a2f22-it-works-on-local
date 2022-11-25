@@ -63,7 +63,7 @@ public class MongoDao {
 	public FindIterable<Document> getTripById(String id) {
 
 		try {
-			Bson filter = Filters.eq("_id",id);
+			Bson filter = Filters.eq("_id",new ObjectId(id));
 			FindIterable<Document> result = this.collection.find(filter);
 			return result;
 		} catch (Exception e) {
@@ -93,7 +93,6 @@ public class MongoDao {
 	}
 
 	public boolean updateTripInfo(String id, double distance, int endTime, String timeElapsed, double discount, double totalCost, double driverPayout) {
-
 		try {
 			Bson filter = Filters.eq("_id", new ObjectId(id));
 			Bson updates = Updates.combine(
@@ -104,7 +103,7 @@ public class MongoDao {
 					Updates.set("totalCost", totalCost),
 					Updates.set("driverPayout", driverPayout));
 
-			UpdateOptions options = new UpdateOptions().upsert(true);
+			UpdateOptions options = new UpdateOptions().upsert(false);
 
 			UpdateResult result = this.collection.updateOne(filter, updates, options);
 			if(result.getModifiedCount() > 0) {
@@ -121,7 +120,7 @@ public class MongoDao {
 		try {
 			Bson filter = Filters.eq("passenger",pid);
 			FindIterable<Document> result = this.collection.find(filter);
-			Bson projection = Projections.fields(Projections.exclude("passenger"));
+			Bson projection = Projections.fields(Projections.exclude("passenger","driverPayout"));
 			return result.projection(projection);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -134,7 +133,7 @@ public class MongoDao {
 		try {
 			Bson filter = Filters.eq("driver",did);
 			FindIterable<Document> result = this.collection.find(filter);
-			Bson projection = Projections.fields(Projections.exclude("driver"));
+			Bson projection = Projections.fields(Projections.exclude("driver", "totalCost", "discount"));
 			return result.projection(projection);
 		} catch (Exception e) {
 			e.printStackTrace();
