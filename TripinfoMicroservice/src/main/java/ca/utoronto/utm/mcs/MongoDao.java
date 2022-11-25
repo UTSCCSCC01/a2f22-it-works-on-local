@@ -4,6 +4,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.*;
 import com.mongodb.*;
+
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
@@ -15,6 +16,8 @@ import com.mongodb.client.MongoCollection;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -67,6 +70,26 @@ public class MongoDao {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public ArrayList<String> getDriver(ObjectId id){
+		try {
+			FindIterable<Document> result = this.collection.find(Filters.eq("_id", id));
+			if(result == null){
+				return null;
+			} else {
+				ArrayList<String> arr = new ArrayList<>();
+				for(Document res: result){
+					arr.add(res.getString("driver"));
+					arr.add(res.getString("passenger"));
+					return arr;
+				}
+				return null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public boolean updateTripInfo(String id, double distance, int endTime, String timeElapsed, double discount, double totalCost, double driverPayout) {
