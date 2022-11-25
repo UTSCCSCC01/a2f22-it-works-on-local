@@ -39,7 +39,7 @@ public class Request extends Endpoint {
             String uid = body.getString("uid");
             int radius = body.getInt("radius");
 
-            String uri = "http://localhost:8000/location/nearbyDriver/" + uid + "?radius=" + Integer.toString(radius);
+            String uri = "http://locationmicroservice:8000/location/nearbyDriver/" + uid + "?radius=" + Integer.toString(radius);
 
             HttpClient c = HttpClient.newBuilder().build();
             HttpRequest request = HttpRequest.newBuilder()

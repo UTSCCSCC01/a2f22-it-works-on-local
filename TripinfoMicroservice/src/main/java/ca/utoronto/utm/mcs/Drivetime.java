@@ -50,7 +50,7 @@ public class Drivetime extends Endpoint {
                 this.sendStatus(r, 404);
                 return;
             } else {
-                String uri = "http://localhost:8000/location/navigation/" + result.get(0) + "?passengerUid=" + result.get(1);
+                String uri = "http://locationmicroservice:8000/location/navigation/" + result.get(0) + "?passengerUid=" + result.get(1);
 
                 HttpClient c = HttpClient.newBuilder().build();
                 HttpRequest request = HttpRequest.newBuilder()
